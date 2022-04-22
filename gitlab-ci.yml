@@ -1,0 +1,18 @@
+variables: 
+  TEST_IMAGE: gcr.io/google-samples/microservices-demo/cartservice:v0.3.6
+
+image: gitlab/dind
+stages:  
+  - build
+  
+build & scan image:  
+  stage: build  
+  script:   
+  - docker pull $TEST_IMAGE  
+  - wget --header "Authorization:Basic $(echo -n $prisma_cloud_compute_username:$prisma_cloud_compute_password | base64 | tr -d '\n')" "$prisma_cloud_compute_url/api/v1/util/twistcli"
+  - chmod +x ./twistcli   
+  - ./twistcli --version   
+  - ./twistcli images scan --address $prisma_cloud_compute_url --user $prisma_cloud_compute_username --password $prisma_cloud_compute_password --details $TEST_IMAGE
+  
+  tags: 
+  - build
